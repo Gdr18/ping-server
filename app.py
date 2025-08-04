@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 from threading import Thread
 
-from utils import get_urls, loop_pings, clean_logs
+from utils import get_urls, loop_pings, clean_logs, write_log
 
 app = Flask(__name__)
 
@@ -11,61 +11,63 @@ def welcome():
 	return jsonify(msg="Bienvenidx a Ping Server!"), 200
 
 
-@app.route("/logs")
-def getting_logs():
-	file_logs = 'logs.txt'
+@app.route("/logs", methods=["GET", "DELETE"])
+def handling_logs():
+	file_logs = "logs.txt"
 	try:
-		with open(file_logs) as file:
-			logs = file.readlines()
-		return jsonify(logs), 200
-	except FileNotFoundError:
-		return jsonify("No hay registros aún. Vuelva a intentarlo dentro de un rato."), 404
+		if request.method == "GET":
+			with open(file_logs) as file:
+				logs = [line.strip() for line in file if line.strip()]
+			return jsonify(logs), 200
+		elif request.method == "DELETE":
+			clean_logs()
+			return jsonify(msg="Registros limpiados de forma satisfactoria."), 200
 	except Exception as e:
-		return jsonify(err=f"Error al leer '{file_logs}': {str(e)}"), 500
-
-
-@app.route("/logs", methods=['DELETE'])
-def deleting_logs():
-	clean_logs()
-	return jsonify(msg="Registros limpiados de forma satisfactoria."), 200
+		write_log(e, "handling_logs()")
+		return jsonify(err=f"Error en 'handling_logs()': {str(e)}"), 500
 
 
 @app.route("/urls", methods=['GET'])
 def getting_urls():
-	urls = get_urls()
-	return jsonify(urls), 200
-
-
-@app.route("/urls", methods=['POST'])
-def adding_url():
-	file_urls = 'urls.txt'
-	new_url = request.json.get('url').lower().strip()
-	urls = get_urls()
-	if new_url in urls:
-		return jsonify(err=f"La URL '{new_url}' ya existe."), 400
 	try:
-		with open(file_urls, 'a') as file:
-			file.write(f"{new_url}\n")
-		return jsonify(msg=f"URL '{new_url}' añadida de forma satisfactoria."), 201
+		urls = get_urls()
+		return jsonify(urls), 200
 	except Exception as e:
-		return jsonify(err=f"Error al escribir en '{file_urls}': {str(e)}"), 500
+		write_log(e, "getting_urls()")
+		return jsonify(err=f"Error en 'getting_urls()': {str(e)}"), 500
 
 
-@app.route("/urls/<url>", methods=['DELETE'])
-def deleting_url(url):
-	url = url.lower().strip()
-	file_urls = 'urls.txt'
-	urls = get_urls()
-	if url not in urls:
-		return jsonify(err=f"La URL '{url}' no existe."), 404
-	urls.remove(url)
+@app.route("/urls", methods=['POST', 'DELETE'])
+def handling_url():
+	file_urls = "urls.txt"
+	url = request.get_json().get("url").lower().strip()
 	try:
-		with open(file_urls, 'w') as file:
-			for existing_url in urls:
-				file.write(f"{existing_url}\n")
-		return jsonify(msg=f"URL '{url}' eliminada de forma satisfactoria."), 200
+		urls = get_urls()
+		if not isinstance(urls, list):
+			raise Exception("Error al obtener las URLs.")
+
+		if request.method == 'POST':
+			if url in urls:
+				exc = Exception(f"La URL '{url}' ya existe.")
+				exc.status_code = 409
+				raise exc
+			with open(file_urls, 'a') as file:
+				file.write(f"{url}\n")
+			return jsonify(msg=f"URL '{url}' añadida de forma satisfactoria."), 201
+
+		elif request.method == 'DELETE':
+			if url not in urls:
+				exc = Exception(f"La URL '{url}' no existe.")
+				exc.status_code = 404
+				raise exc
+			urls.remove(url)
+			with open(file_urls, 'w') as file:
+				for existing_url in urls:
+					file.write(f"{existing_url}\n")
+			return jsonify(msg=f"URL '{url}' eliminada de forma satisfactoria."), 200
 	except Exception as e:
-		return jsonify(err=f"Error al escribir en '{file_urls}': {str(e)}"), 500
+		write_log(e, "handling_url()")
+		return jsonify(err=f"Error en 'handling_url()': {str(e)}"), getattr(e, "status_code", 500)
 
 
 if __name__ == '__main__':

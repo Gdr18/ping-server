@@ -1,18 +1,16 @@
 import time
 from datetime import datetime
 import requests
-from typing import Union
-from flask import Response
 
 
-def get_urls() -> Union[list, None]:
+def get_urls() -> list[str] | None:
 	urls_file = 'urls.txt'
 	try:
 		with open(urls_file) as file:
 			urls_list = [line.strip() for line in file]
 		return urls_list
 	except Exception as e:
-		print(f"Error al leer '{urls_file}': {str(e)}")
+		write_log(e, "get_urls()")
 
 
 INTERVAL = 840
@@ -20,27 +18,33 @@ CLEANING_DAY = 1
 last_cleaning = None
 
 
-def write_log(response: Response, url: str):
+def write_log(response: requests.Response | Exception , resource: str):
 	logs_file = 'logs.txt'
 	now = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
-	status_code = getattr(response, 'status_code', 'N/A')
+	if isinstance(response, requests.Response):
+		status_code = response.status_code
+		message = f"[{now}] - {resource} - status: {status_code}\n"
+	else:
+		message = f"[{now}] - {resource} - error: {str(response)}\n"
 	try:
 		with open(logs_file, 'a') as file:
-			file.write(f"[{now}] - {url} - status: {status_code}\n")
+			file.write(message)
 	except Exception as e:
-		print(f"Error al escribir en '{logs_file}': {str(e)}")
+		message = f"[{now}] - write_log() - error: {str(e)}\n"
+		with open(logs_file, 'a') as file:
+			file.write(message)
 
 
 def clean_logs():
 	global last_cleaning
-	now = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+	now = datetime.now()
 	logs_file = 'logs.txt'
 	try:
-		with open(logs_file, "w") as f:
-			f.write(f"Registros limpiados: [{now}].\n")
-		last_cleaning = now
+		with open(logs_file, "w") as file:
+			file.write(f'[{now.strftime("%d-%m-%Y %H:%M:%S")}] - Registros limpiados.\n')
+		last_cleaning = now.date()
 	except Exception as e:
-		print(f"Error al limpiar '{logs_file}': {e}")
+		write_log(e, "clean_logs()")
 
 
 def checking_cleaning_day():
@@ -53,10 +57,13 @@ def loop_pings():
 	while True:
 		checking_cleaning_day()
 		urls = get_urls()
-		for url in urls:
-			try:
-				response = requests.get(url)
-				write_log(response, url)
-			except Exception as e:
-				write_log(e, url)
+		if isinstance(urls, list):
+			for url in urls:
+				try:
+					response = requests.get(url)
+					write_log(response, url)
+				except Exception as e:
+					write_log(e, url)
+		else:
+			write_log(Exception("Archivo 'urls.txt' vacío."), "loop_pings()")
 		time.sleep(INTERVAL)
