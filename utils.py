@@ -41,7 +41,7 @@ def clean_logs():
 	logs_file = 'logs.txt'
 	try:
 		with open(logs_file, "w") as file:
-			file.write(f'[{now.strftime("%d-%m-%Y %H:%M:%S")}] - Registros limpiados.\n')
+			file.write(f'[{now.strftime("%d-%m-%Y %H:%M:%S")}] - Historial de registros limpiado.\n')
 		last_cleaning = now.date()
 	except Exception as e:
 		write_log(e, "clean_logs()")

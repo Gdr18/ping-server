@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 from threading import Thread
+import re
 
 from utils import get_urls, loop_pings, clean_logs, write_log
 
@@ -21,7 +22,7 @@ def handling_logs():
 			return jsonify(logs), 200
 		elif request.method == "DELETE":
 			clean_logs()
-			return jsonify(msg="Registros limpiados de forma satisfactoria."), 200
+			return jsonify(msg="Historial de registros eliminado correctamente."), 200
 	except Exception as e:
 		write_log(e, "handling_logs()")
 		return jsonify(err=f"Error en 'handling_logs()': {str(e)}"), 500
@@ -41,12 +42,17 @@ def getting_urls():
 def handling_url():
 	file_urls = "urls.txt"
 	url = request.get_json().get("url").lower().strip()
+	regex_url = r'^https?:\/\/(?:www\.)?[a-zA-Z0-9-]+\.[a-zA-Z]{2,}\/?$'
 	try:
 		urls = get_urls()
 		if not isinstance(urls, list):
 			raise Exception("Error al obtener las URLs.")
 
 		if request.method == 'POST':
+			if not url or not re.match(regex_url, url):
+				exc = Exception("La URL proporcionada no es válida.")
+				exc.status_code = 400
+				raise exc
 			if url in urls:
 				exc = Exception(f"La URL '{url}' ya existe.")
 				exc.status_code = 409
@@ -56,6 +62,10 @@ def handling_url():
 			return jsonify(msg=f"URL '{url}' añadida de forma satisfactoria."), 201
 
 		elif request.method == 'DELETE':
+			if not url or not re.match(regex_url, url):
+				exc = Exception("La URL proporcionada no es válida o no se proporcionó.")
+				exc.status_code = 400
+				raise exc
 			if url not in urls:
 				exc = Exception(f"La URL '{url}' no existe.")
 				exc.status_code = 404
