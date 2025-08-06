@@ -62,12 +62,11 @@ def keep_alive():
 	while True:
 		checking_cleaning_day()
 		urls = get_urls()
-		if isinstance(urls, list):
+		if isinstance(urls, list) and len(urls) > 0:
 			for url in urls:
 				try:
 					response = requests.get(url)
 					write_log(response, url)
-					print(f"Ping a {url} - Status: {response.status_code}")
 				except Exception as e:
 					write_log(e, url)
 		else:
