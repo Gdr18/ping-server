@@ -1,4 +1,0 @@
-https://url-shortener-backend-5rxc.onrender.com/urls
-https://lafavoritabar.site/la_favorita_logo.png
-https://planet-gamer-backend.onrender.com/games
-http://localhost:5000/
