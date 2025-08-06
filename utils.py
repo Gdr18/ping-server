@@ -1,10 +1,13 @@
 import time
 from datetime import datetime
+import os
 import requests
 
 
 def get_urls() -> list[str] | None:
 	urls_file = 'urls.txt'
+	if not os.path.exists(urls_file):
+		return []
 	try:
 		with open(urls_file) as file:
 			urls_list = [line.strip() for line in file]
