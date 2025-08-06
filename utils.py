@@ -21,14 +21,16 @@ CLEANING_DAY = 1
 last_cleaning = None
 
 
-def write_log(response: requests.Response | Exception , resource: str):
+def write_log(message: requests.Response | Exception | str, resource: str):
 	logs_file = 'logs.txt'
 	now = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
-	if isinstance(response, requests.Response):
-		status_code = response.status_code
+	if isinstance(message, requests.Response):
+		status_code = message.status_code
 		message = f"[{now}] - {resource} - status: {status_code}\n"
+	elif isinstance(message, Exception):
+		message = f"[{now}] - {resource} - error: {str(message)}\n"
 	else:
-		message = f"[{now}] - {resource} - error: {str(response)}\n"
+		message = f"[{now}] - {resource} - info: {message}\n"
 	try:
 		with open(logs_file, 'a') as file:
 			file.write(message)
@@ -65,6 +67,7 @@ def keep_alive():
 				try:
 					response = requests.get(url)
 					write_log(response, url)
+					print(f"Ping a {url} - Status: {response.status_code}")
 				except Exception as e:
 					write_log(e, url)
 		else:

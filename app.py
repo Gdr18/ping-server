@@ -63,6 +63,7 @@ def handling_url():
 				raise exc
 			with open(file_urls, 'a') as file:
 				file.write(f"{url}\n")
+			write_log(f"URL '{url}' añadida.", "handling_url()")
 			return jsonify(msg=f"URL '{url}' añadida de forma satisfactoria."), 201
 
 		elif request.method == 'DELETE':
@@ -78,6 +79,7 @@ def handling_url():
 			with open(file_urls, 'w') as file:
 				for existing_url in urls:
 					file.write(f"{existing_url}\n")
+			write_log(f"URL '{url}' eliminada.", "handling_url()")
 			return jsonify(msg=f"URL '{url}' eliminada de forma satisfactoria."), 200
 	except Exception as e:
 		write_log(e, "handling_url()")
