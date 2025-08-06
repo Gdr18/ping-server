@@ -44,8 +44,9 @@ def getting_urls():
 @app.route("/urls", methods=['POST', 'DELETE'])
 def handling_url():
 	file_urls = "urls.txt"
-	url = request.get_json().get("url").lower().strip()
-	regex_url = r'^https?:\/\/(?:www\.)?[a-zA-Z0-9-]+\.[a-zA-Z]{2,}\/?$'
+	url = request.get_json().get("url")
+	regex_url = r'^https?:\/\/(?:localhost|(?:\d{1,3}\.){3}\d{1,3}|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})(?::\d+)?(?:\/.*)?$'
+
 	try:
 		urls = get_urls()
 		if not isinstance(urls, list):
