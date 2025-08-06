@@ -1,3 +1,4 @@
+import os.path
 from flask import Flask, request, jsonify
 from threading import Thread
 import re
@@ -17,8 +18,10 @@ def handling_logs():
 	file_logs = "logs.txt"
 	try:
 		if request.method == "GET":
-			with open(file_logs) as file:
-				logs = [line.strip() for line in file if line.strip()]
+			logs = []
+			if os.path.exists(file_logs):
+				with open(file_logs) as file:
+					logs = [line.strip() for line in file if line.strip()]
 			return jsonify(logs), 200
 		elif request.method == "DELETE":
 			clean_logs()
@@ -50,7 +53,7 @@ def handling_url():
 
 		if request.method == 'POST':
 			if not url or not re.match(regex_url, url):
-				exc = Exception("La URL proporcionada no es válida.")
+				exc = Exception("La URL proporcionada no es válida o no se proporcionó.")
 				exc.status_code = 400
 				raise exc
 			if url in urls:
