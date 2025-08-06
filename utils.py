@@ -53,7 +53,7 @@ def checking_cleaning_day():
 		clean_logs()
 
 
-def loop_pings():
+def keep_alive():
 	while True:
 		checking_cleaning_day()
 		urls = get_urls()

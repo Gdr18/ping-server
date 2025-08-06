@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 from threading import Thread
 import re
 
-from utils import get_urls, loop_pings, clean_logs, write_log
+from utils import get_urls, keep_alive, clean_logs, write_log
 
 app = Flask(__name__)
 
@@ -81,5 +81,5 @@ def handling_url():
 
 
 if __name__ == '__main__':
-	Thread(target=loop_pings, daemon=True).start()
+	Thread(target=keep_alive, daemon=True).start()
 	app.run()

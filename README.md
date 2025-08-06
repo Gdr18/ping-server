@@ -23,7 +23,7 @@ Este proyecto es un servidor en Python que no solo realiza pings periódicos a u
 
 - De forma manual:
   - Permite añadir nuevas URLs, solicitar las existentes o eliminarlas a través del endpoint `/urls`
-  - Permite leer los logs y limpiarlos a través del endpoint `/logs`
+  - Permite leer el historial de logs y limpiarlo a través del endpoint `/logs`
 
 ---
 
@@ -54,6 +54,7 @@ python app.py
 - `app.py`: Punto de entrada del servidor y configuración de rutas.
 
 ### ⚠️ Nota importante!
+Este proyecto no trabaja con una base de datos, sino que utiliza archivos de texto (`urls.txt` y `logs.txt`) para almacenar la información.
 No hace falta crear los archivos `urls.txt` ni `logs.txt`, el script los crea automáticamente si no existen.
 
 ---
