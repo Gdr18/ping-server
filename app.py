@@ -1,4 +1,4 @@
-import os.path
+import os
 from flask import Flask, request, jsonify
 from threading import Thread
 import re
@@ -89,4 +89,4 @@ def handling_url():
 
 
 if __name__ == '__main__':
-	app.run()
+	app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
