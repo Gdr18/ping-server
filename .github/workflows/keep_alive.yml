@@ -9,6 +9,9 @@ jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
+      - name: Instalar jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+        
       - name: Ping + Alerta
         run: |
           echo "Ejecutando pings a las URLs:"
