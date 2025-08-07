@@ -1,51 +1,40 @@
-name: Keep Alive Ping
+name: Ping Keep Alive URLs
 
 on:
   schedule:
-    - cron: '*/10 * * * *'  # Cada 10 minutos
-  workflow_dispatch:        # Permite lanzarlo manualmente desde GitHub
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
 
 jobs:
-  ping_urls:
+  ping:
     runs-on: ubuntu-latest
 
+    env:
+      URLS: ${{ secrets.KEEP_ALIVE_URLS }}
+      DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+
     steps:
-      - name: Clonar el repositorio
-        uses: actions/checkout@v4
-
-      - name: Verificar archivo de URLs
+      - name: Hacer ping a las URLs y enviar alerta si falla alguna
         run: |
-          echo "Contenido de .urls.txt:"
-          cat .urls.txt || echo "❌ Archivo .urls.txt no encontrado"
+          echo "Iniciando pings..."
 
-      - name: Leer URLs y enviar alerta si fallan
-        run: |
-          echo "Ejecutando pings a las URLs:"
+          IFS=',' read -ra URL_ARRAY <<< "$URLS"
           error_urls=""
 
-          while IFS= read -r url; do
-            # Ignora líneas vacías o que comienzan por #
-            if [[ -z "$url" || "$url" =~ ^# ]]; then
-              continue
+          for url in "${URL_ARRAY[@]}"; do
+            echo "Haciendo ping a: $url"
+            status_code=$(curl -s -o /dev/null -w "%{http_code}" "$url")
+
+            if [ "$status_code" -ne 200 ]; then
+              echo "⚠️ Error al hacer ping a $url (Status: $status_code)"
+              error_urls+="• $url (status: $status_code)\n"
             fi
+          done
 
-            echo "→ $url"
-            code=$(curl -s -o /dev/null -w "%{http_code}" "$url")
-            echo "  ↳ Código HTTP: $code"
-
-            if [[ "$code" -ge 400 ]]; then
-              error_urls+="$url → Código $code\\n"
-            fi
-          done < .urls.txt
-
-          if [[ -n "$error_urls" ]]; then
-            echo "❌ Fallos detectados:"
-            echo -e "$error_urls"
-
-            payload="{\"content\":\":warning: **Error en keep-alive**\\n\\n$error_urls\"}"
-            curl -X POST -H "Content-Type: application/json" \
-              -d "$payload" \
-              "${{ secrets.DISCORD_WEBHOOK }}"
+          if [ -n "$error_urls" ]; then
+            echo "Enviando alerta a Discord..."
+            payload="{\"content\": \"❌ *Alerta de Ping:* Las siguientes URL fallaron:\n$error_urls\"}"
+            curl -X POST -H "Content-Type: application/json" -d "$payload" "$DISCORD_WEBHOOK_URL"
           else
-            echo "✅ Todas las URLs respondieron correctamente."
+            echo "✅ Todos los pings se realizaron con éxito."
           fi
