@@ -33,4 +33,3 @@ jobs:
           else
             echo "✅ Todas las URLs respondieron correctamente."
           fi
-
