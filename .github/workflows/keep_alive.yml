@@ -11,7 +11,7 @@ jobs:
 
     env:
       URLS: ${{ secrets.KEEP_ALIVE_URLS }}
-      DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+      DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK }}
 
     steps:
       - name: Hacer ping a las URLs y enviar alerta si falla alguna
