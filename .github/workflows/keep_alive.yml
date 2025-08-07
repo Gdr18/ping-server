@@ -31,7 +31,7 @@ jobs:
             if [[ "$code" -ge 400 ]]; then
               error_urls+="$url → Código $code\\n"
             fi
-          done < .urls
+          done < .urls.txt
 
           if [[ -n "$error_urls" ]]; then
             echo "❌ Fallos detectados:"
