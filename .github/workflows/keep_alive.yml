@@ -22,18 +22,20 @@ jobs:
           error_urls=""
 
           for url in "${URL_ARRAY[@]}"; do
-            echo "Haciendo ping a: $url"
-            status_code=$(curl -s -o /dev/null -w "%{http_code}" "$url")
+            url_trimmed=$(echo "$url" | xargs)  # elimina espacios alrededor
+            echo "Haciendo ping a: $url_trimmed"
+            status_code=$(curl -s -o /dev/null -w "%{http_code}" "$url_trimmed")
 
             if [ "$status_code" -ne 200 ]; then
-              echo "⚠️ Error al hacer ping a $url (Status: $status_code)"
-              error_urls+="• $url (status: $status_code)\n"
+              echo "⚠️ Error al hacer ping a $url_trimmed (Status: $status_code)"
+              error_urls+="• $url_trimmed (status: $status_code)\n"
             fi
           done
 
           if [ -n "$error_urls" ]; then
             echo "Enviando alerta a Discord..."
-            payload="{\"content\": \"❌ *Alerta de Ping:* Las siguientes URL fallaron:\n$error_urls\"}"
+            escaped_errors=$(echo -e "$error_urls" | sed ':a;N;$!ba;s/\n/\\n/g' | sed 's/"/\\"/g')
+            payload="{\"content\": \"❌ *Alerta de Ping:* Las siguientes URL fallaron:\\n$escaped_errors\"}"
             curl -X POST -H "Content-Type: application/json" -d "$payload" "$DISCORD_WEBHOOK_URL"
           else
             echo "✅ Todos los pings se realizaron con éxito."
