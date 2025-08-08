@@ -1,18 +1,17 @@
-# syntax=docker/dockerfile:1
-
 ARG PYTHON_VERSION=3.11.9
 
 FROM python:${PYTHON_VERSION}-slim
 
-LABEL fly_launch_runtime="flask"
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
 
 WORKDIR /code
 
-COPY requirements.txt requirements.txt
-RUN pip3 install -r requirements.txt
+COPY requirements.txt .
+
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-EXPOSE 8080
-
-CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0", "--port=8080"]
+CMD ["gunicorn", "-w", "1", "--threads", "2", "-b", "0.0.0.0:8000", "app:app"]
