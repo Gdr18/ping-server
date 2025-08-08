@@ -6,7 +6,6 @@ import requests
 URLS_FILE = '/data/urls.txt'
 LOGS_FILE = '/data/logs.txt'
 INTERVAL = 480
-CLEANING_DAY = [1, 8, 15, 22]
 last_cleaning = None
 
 
@@ -39,18 +38,18 @@ def clean_logs():
 	last_cleaning = now.date()
 
 
-def checking_cleaning_day():
+def check_cleaning():
 	today = datetime.now().date()
-	if today.day in CLEANING_DAY and (last_cleaning is None or last_cleaning != today):
+	if last_cleaning != today:
 		clean_logs()
 
 
 def keep_alive():
 	while True:
 		try:
-			checking_cleaning_day()
+			check_cleaning()
 			urls = get_urls()
-			if isinstance(urls, list) and len(urls) > 0:
+			if len(urls) > 0:
 				for url in urls:
 					response = requests.get(url)
 					write_log(response, url)
