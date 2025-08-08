@@ -5,7 +5,7 @@ import requests
 
 URLS_FILE = '/data/urls.txt'
 LOGS_FILE = '/data/logs.txt'
-INTERVAL = 600
+INTERVAL = 480
 CLEANING_DAY = [1, 8, 15, 22]
 last_cleaning = None
 
