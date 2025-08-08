@@ -35,7 +35,7 @@ def clean_logs():
 	global last_cleaning
 	now = datetime.now(ZoneInfo("Europe/Madrid"))
 	with open(LOGS_FILE, "w") as file:
-		file.write(f'[{now}] - Historial de registros limpiado.\n')
+		file.write(f'[{now.strftime("%d-%m-%Y %H:%M:%S")}] - Historial de registros limpiado.\n')
 	last_cleaning = now.date()
 
 
