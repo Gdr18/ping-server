@@ -15,13 +15,13 @@ Este proyecto es un servidor en Python que no solo realiza pings periódicos a u
 
 ## ✨ Funcionalidades principales
 
-- De forma automática:
+- Keep-Alive de URLs:
   - Lee una lista de URLs desde `urls.txt`
   - Realiza pings periódicos a cada URL y registra el estado en `logs.txt`
   - Limpieza automática de logs el día configurado de cada mes
   - Registro de errores en `logs.txt`'
 
-- De forma manual:
+- API:
   - Permite añadir nuevas URLs, solicitar las existentes o eliminarlas a través del endpoint `/urls`
   - Permite leer el historial de logs y limpiarlo a través del endpoint `/logs`
 
@@ -31,7 +31,8 @@ Este proyecto es un servidor en Python que no solo realiza pings periódicos a u
 
 1. Clona este repositorio:
 ```bash
-git clone https://github.com/Gdr18/ping_server.git cd ping_server 
+git clone https://github.com/Gdr18/ping-server.git
+cd ping_server  
 ```
 2. Crea y activa un entorno virtual:
 ```bash
@@ -62,7 +63,6 @@ No hace falta crear los archivos `urls.txt` ni `logs.txt`, el script los crea au
 ## ⚙️ Variables configurables
 
 - `INTERVAL`: Intervalo entre solicitudes (segundos).
-- `CLEANING_DAY`: Día del mes en que se limpian los logs.
 
 ---
 

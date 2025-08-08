@@ -26,7 +26,7 @@ def handling_logs():
 		if request.method == "GET":
 			logs = []
 			if os.path.exists(LOGS_FILE):
-				with open(LOGS_FILE, encoding="latin-1") as file:
+				with open(LOGS_FILE) as file:
 					logs = [line.strip() for line in file if line.strip()]
 			return jsonify(logs), 200
 		elif request.method == "DELETE":
@@ -89,4 +89,4 @@ def handling_url():
 
 
 if __name__ == '__main__':
-	app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+	app.run()

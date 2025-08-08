@@ -2,10 +2,11 @@ import time
 from datetime import datetime
 import os.path
 import requests
+from zoneinfo import ZoneInfo
 
 URLS_FILE = 'urls.txt'
 LOGS_FILE = 'logs.txt'
-INTERVAL = 480
+INTERVAL = 600
 last_cleaning = None
 
 
@@ -18,7 +19,7 @@ def get_urls() -> list:
 
 
 def write_log(message: requests.Response | Exception | str, resource: str):
-	now = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+	now = datetime.now(ZoneInfo("Europe/Madrid")).strftime("%d-%m-%Y %H:%M:%S")
 	if isinstance(message, requests.Response):
 		status_code = message.status_code
 		message = f"[{now}] - {resource} - status: {status_code}\n"
@@ -32,9 +33,9 @@ def write_log(message: requests.Response | Exception | str, resource: str):
 
 def clean_logs():
 	global last_cleaning
-	now = datetime.now()
+	now = datetime.now(ZoneInfo("Europe/Madrid"))
 	with open(LOGS_FILE, "w") as file:
-		file.write(f'[{now.strftime("%d-%m-%Y %H:%M:%S")}] - Historial de registros limpiado.\n')
+		file.write(f'[{now}] - Historial de registros limpiado.\n')
 	last_cleaning = now.date()
 
 
