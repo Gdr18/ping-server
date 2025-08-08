@@ -3,8 +3,8 @@ from datetime import datetime
 import os.path
 import requests
 
-URLS_FILE = 'urls.txt'
-LOGS_FILE = 'logs.txt'
+URLS_FILE = '/data/urls.txt'
+LOGS_FILE = '/data/logs.txt'
 INTERVAL = 600
 CLEANING_DAY = [1, 8, 15, 22]
 last_cleaning = None
