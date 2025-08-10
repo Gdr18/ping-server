@@ -20,6 +20,11 @@ def welcome():
 	return jsonify(msg="Bienvenidx a Ping Server!"), 200
 
 
+@app.route("/keep-alive", methods=["GET"])
+def keep_alive_dev():
+	return jsonify(msg="Keep alive Ping Server realizado de forma satisfactoria"), 200
+
+
 @app.route("/logs", methods=["GET", "DELETE"])
 def handling_logs():
 	try:

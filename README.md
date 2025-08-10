@@ -21,7 +21,7 @@ Este proyecto es un servidor en Python que no solo realiza pings periódicos a u
   - Limpieza automática de logs el día configurado de cada mes
   - Registro de errores en `logs.txt`'
 
-- API:
+- API REST:
   - Permite añadir nuevas URLs, solicitar las existentes o eliminarlas a través del endpoint `/urls`
   - Permite leer el historial de logs y limpiarlo a través del endpoint `/logs`
 
