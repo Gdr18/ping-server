@@ -1,4 +1,4 @@
-﻿# 🟢 Ping Server – Monitorización y Keep-Alive de URLs
+﻿# 🟢 Ping Server – Keep-Alive de URLs, API REST y Logs
 
 Este proyecto es un servidor en Python que no solo realiza pings periódicos a una lista de URLs para mantener activos servicios web (ideal para evitar que se duerman en hostings gratuitos), sino que también expone una API ligera para gestionar dinámicamente el sistema.
 
