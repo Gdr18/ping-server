@@ -2,6 +2,12 @@
 
 Este proyecto es un servidor en Python que no solo realiza pings periódicos a una lista de URLs para mantener activos servicios web (ideal para evitar que se duerman en hostings gratuitos), sino que también expone una API ligera para gestionar dinámicamente el sistema.
 
+⚠️ **Limitaciones en hostings gratuitos:** 
+- Suspensión automática por inactividad (reinicios → pérdida de archivos .txt).
+- Almacenamiento no fiable para urls.txt y logs.txt.
+- Restricciones de rate limit al realizar pings periódicos.
+- Por ello se recomienda ejecutarlo en un entorno controlado (equipo local, Raspberry Pi, contenedor siempre activo)
+
 ---
 
 ## 🚀 Tecnologías utilizadas
