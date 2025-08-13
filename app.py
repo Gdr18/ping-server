@@ -8,13 +8,6 @@ from utils import get_urls, keep_alive, clean_logs, write_log, URLS_FILE, LOGS_F
 app = Flask(__name__)
 
 
-def start_keep_alive():
-	Thread(target=keep_alive, daemon=True).start()
-
-
-start_keep_alive()
-
-
 @app.route('/')
 def welcome():
 	return jsonify(msg="Bienvenidx a Ping Server!"), 200
@@ -94,4 +87,5 @@ def handling_url():
 
 
 if __name__ == '__main__':
+	Thread(target=keep_alive, daemon=True).start()
 	app.run()
