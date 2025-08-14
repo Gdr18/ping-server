@@ -24,12 +24,12 @@ Este proyecto es un servidor en Python que no solo realiza pings periódicos a u
 - Keep-Alive de URLs:
   - Lee una lista de URLs desde `urls.txt`
   - Realiza pings periódicos a cada URL y registra el estado en `logs.txt`
-  - Limpieza automática de logs el día configurado de cada mes
+  - Limpieza automática de logs cada 24 horas
   - Registro de errores en `logs.txt`'
 
 - API REST:
-  - Permite añadir nuevas URLs, solicitar las existentes o eliminarlas a través del endpoint `/urls`
-  - Permite leer el historial de logs y limpiarlo a través del endpoint `/logs`
+  - Permite añadir nuevas URLs, solicitar las existentes o eliminarlas
+  - Permite leer el historial de logs y limpiarlo
 
 ---
 
@@ -57,7 +57,7 @@ python app.py
 
 ## 📝 Archivos importantes
 
-- `utils.py`: Lógica principal de monitorización y loop periódico.
+- `utils.py`: Lógica principal de registros y loop periódico.
 - `app.py`: Punto de entrada del servidor y configuración de rutas.
 
 ### ⚠️ Nota importante!
@@ -75,7 +75,7 @@ No hace falta crear los archivos `urls.txt` ni `logs.txt`, el script los crea au
 ## 📓 Documentación de la API
 
 Puedes consultar la documentación y probar todos los endpoints desde la colección de Postman: 
-🔗 [Colección de Postman](https://.postman.co/workspace/My-Workspace~959b1184-c553-4747-8bce-84d1bf72923a/collection/26739293-8e0873ea-2de2-468f-baf1-e6770c96f6c3?action=share&creator=26739293)
+🔗 [Colección de Postman](https://www.postman.com/maintenance-participant-28116252/workspace/gdor-comparte/collection/26739293-8e0873ea-2de2-468f-baf1-e6770c96f6c3?action=share&creator=26739293)
 
 ---
 

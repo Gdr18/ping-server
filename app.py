@@ -35,24 +35,15 @@ def handling_logs():
 		return jsonify(err=f"Error en 'handling_logs()' [{request.method}]: {str(e)}"), 500
 
 
-@app.route("/urls", methods=['GET'])
-def getting_urls():
+@app.route("/urls", methods=['GET', 'POST'])
+def handling_urls():
 	try:
 		urls = get_urls()
-		return jsonify(urls), 200
-	except Exception as e:
-		write_log(e, "getting_urls()")
-		return jsonify(err=f"Error en 'getting_urls()' [{request.method}]: {str(e)}"), 500
-
-
-@app.route("/urls", methods=['POST', 'DELETE'])
-def handling_url():
-	url = request.get_json().get("url")
-	regex_url = r'^https?:\/\/(?:localhost|(?:\d{1,3}\.){3}\d{1,3}|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})(?::\d+)?(?:\/.*)?$'
-	try:
-		urls = get_urls()
-
+		if request.method == 'GET':
+			return jsonify(urls), 200
 		if request.method == 'POST':
+			url = request.get_json().get("url")
+			regex_url = r'^https?:\/\/(?:localhost|(?:\d{1,3}\.){3}\d{1,3}|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})(?::\d+)?(?:\/.*)?$'
 			if not url or not re.match(regex_url, url):
 				exc = Exception("La URL proporcionada no es válida o no se proporcionó.")
 				exc.status_code = 400
@@ -65,25 +56,34 @@ def handling_url():
 				file.write(f"{url}\n")
 			write_log(f"URL '{url}' añadida.", "handling_url()")
 			return jsonify(msg=f"URL '{url}' añadida de forma satisfactoria."), 201
-
-		elif request.method == 'DELETE':
-			if not url or not re.match(regex_url, url):
-				exc = Exception("La URL proporcionada no es válida o no se proporcionó.")
-				exc.status_code = 400
-				raise exc
-			if url not in urls:
-				exc = Exception(f"La URL '{url}' no existe.")
-				exc.status_code = 404
-				raise exc
-			urls.remove(url)
-			with open(URLS_FILE, 'w') as file:
-				for existing_url in urls:
-					file.write(f"{existing_url}\n")
-			write_log(f"URL '{url}' eliminada.", "handling_url()")
-			return jsonify(msg=f"URL '{url}' eliminada de forma satisfactoria."), 200
 	except Exception as e:
-		write_log(e, f"handling_url() [{request.method}]")
-		return jsonify(err=f"Error en 'handling_url()' [{request.method}]: {str(e)}"), getattr(e, "status_code", 500)
+		write_log(e, "handling_urls()")
+		return jsonify(err=f"Error en 'handling_urls()' [{request.method}]: {str(e)}"), 500
+
+
+@app.route("/urls/delete", methods=['POST'])
+def deleting_url():
+	try:
+		regex_url = r'^https?:\/\/(?:localhost|(?:\d{1,3}\.){3}\d{1,3}|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})(?::\d+)?(?:\/.*)?$'
+		url = request.get_json().get("url")
+		if not url or not re.match(regex_url, url):
+			exc = Exception("La URL proporcionada no es válida o no se proporcionó.")
+			exc.status_code = 400
+			raise exc
+		urls = get_urls()
+		if url not in urls:
+			exc = Exception(f"La URL '{url}' no existe.")
+			exc.status_code = 404
+			raise exc
+		urls.remove(url)
+		with open(URLS_FILE, 'w') as file:
+			for existing_url in urls:
+				file.write(f"{existing_url}\n")
+		write_log(f"URL '{url}' eliminada.", "deleting_url()")
+		return jsonify(msg=f"URL '{url}' eliminada de forma satisfactoria."), 200
+	except Exception as e:
+		write_log(e, f"deleting_url()")
+		return jsonify(err=f"Error en 'deleting_url()': {str(e)}"), getattr(e, "status_code", 500)
 
 
 if __name__ == '__main__':
